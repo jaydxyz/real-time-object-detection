@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import time
 
 # Load YOLO
 net = cv2.dnn.readNet("yolov4.weights", "yolov4.cfg")
@@ -12,6 +13,10 @@ colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
 # Load video stream
 cap = cv2.VideoCapture(0)  # Use 0 for webcam, or provide a video file path
+
+# Variables for FPS calculation
+prev_time = 0
+curr_time = 0
 
 while True:
     _, frame = cap.read()
@@ -54,6 +59,12 @@ while True:
             color = colors[class_ids[i]]
             cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
             cv2.putText(frame, label, (x, y - 5), font, 1, color, 1)
+
+    # Calculate and display FPS
+    curr_time = time.time()
+    fps = 1 / (curr_time - prev_time)
+    prev_time = curr_time
+    cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), font, 2, (0, 255, 0), 2)
 
     # Display the resulting frame
     cv2.imshow("Real-Time Object Detection", frame)
